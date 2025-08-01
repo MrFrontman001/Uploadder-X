@@ -8,13 +8,6 @@ import pytz
 import asyncio
 import requests
 import subprocess
-async def safe_edit(msg, text):
-    try:
-        if msg:
-            await msg.edit(text)
-    except Exception as e:
-        print(f"Edit error: {e}")
-
 import urllib
 import urllib.parse
 import yt_dlp
@@ -72,7 +65,7 @@ bot = Client(
 cookies_file_path = os.getenv("cookies_file_path", "youtube_cookies.txt")
 api_url = "http://master-api-v3.vercel.app/"
 api_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzkxOTMzNDE5NSIsInRnX3VzZXJuYW1lIjoi4p61IFtvZmZsaW5lXSIsImlhdCI6MTczODY5MjA3N30.SXzZ1MZcvMp5sGESj0hBKSghhxJ3k1GTWoBUbivUe1I"
-token_cp ='eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MTM4NDMwMDk5LCJvcmdJZCI6MTY5MSwidHlwZSI6MSwibW9iaWxlIjoiOTE5MTcyMTYxOTcwIiwibmFtZSI6IlN1bWl0IER1ZGhlIiwiZW1haWwiOiJzdW1pdGR1ZGhlMjAwMkBnbWFpbC5jb20iLCJpc0ludGVybmF0aW9uYWwiOjAsImRlZmF1bHRMYW5ndWFnZSI6IkVOIiwiY291bnRyeUNvZGUiOiJJTiIsImNvdW50cnlJU08iOiI5MSIsInRpbWV6b25lIjoiR01UKzU6MzAiLCJpc0RpeSI6dHJ1ZSwib3JnQ29kZSI6ImFrZSIsImlzRGl5U3ViYWRtaW4iOjAsImZpbmdlcnByaW50SWQiOiIxYjY3NDU2ZGU5YTI0ZWVkYjQ4NDdiYTVlYjhmMjU5MiIsImlhdCI6MTc1Mzk4NTIxOSwiZXhwIjoxNzU0NTkwMDE5fQ.1gkRJzM8Mm6Mi9FEQRDKMU6Kb5WrkY7PxTC_SPCAqHzY4cvFJoqo4Zi-cnhjKqK3'
+token_cp ='eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9r'
 adda_token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkcGthNTQ3MEBnbWFpbC5jb20iLCJhdWQiOiIxNzg2OTYwNSIsImlhdCI6MTc0NDk0NDQ2NCwiaXNzIjoiYWRkYTI0Ny5jb20iLCJuYW1lIjoiZHBrYSIsImVtYWlsIjoiZHBrYTU0NzBAZ21haWwuY29tIiwicGhvbmUiOiI3MzUyNDA0MTc2IiwidXNlcklkIjoiYWRkYS52MS41NzMyNmRmODVkZDkxZDRiNDkxN2FiZDExN2IwN2ZjOCIsImxvZ2luQXBpVmVyc2lvbiI6MX0.0QOuYFMkCEdVmwMVIPeETa6Kxr70zEslWOIAfC_ylhbku76nDcaBoNVvqN4HivWNwlyT0jkUKjWxZ8AbdorMLg"
 photologo = 'https://files.catbox.moe/9cqh82.jpg' #https://envs.sh/GV0.jpg
 photoyt = 'https://tinypic.host/images/2025/03/18/YouTube-Logo.wine.png' #https://envs.sh/GVi.jpg
@@ -757,15 +750,14 @@ async def txt_handler(bot: Client, m: Message):
             if "acecwply" in url:
                     cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}][ext=mp4]/bv[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[ext=mp4]" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
 
-            elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+            elif "https://cpvod.testbook.com/" in url:
                 url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
                 url = 'https://dragoapi.vercel.app/classplus?link=' + url
-                #url = f"https://cpapi-rjbs-1l0p.onrender.com/extract_keys?url={url}@bots_updatee&user_id=7793257011"
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
                 keys_string = " ".join([f"--key {key}" for key in keys])
 
-            elif "classplusapp" in url:
+            elif "classplusapp.com/drm/" in url:
                 url = 'https://dragoapi.vercel.app/classplus?link=' + url
                 mpd, keys = helper.get_mps_and_keys(url)
                 url = mpd
@@ -781,9 +773,8 @@ async def txt_handler(bot: Client, m: Message):
                 url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{token_cp}'}).json()['url']
             
             elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url: 
-                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{token_cp}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
-                params = {"url": f"{url}"}
-                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                headers = { 'x-access-token': f'{token_cp}',"X-CDN-Tag": "empty"}
+                response = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers=headers)
                 url   = response.json()['url']
 
             elif "childId" in url and "parentId" in url:
@@ -1438,10 +1429,7 @@ async def remove_chat_cmd(bot: Client, message: Message):
 
     except ValueError:
         await message.reply_text(
-            try:
-                "╭━━━━━━━━━━━━━━━━━╮\n"
-            except Exception as e:
-                print(f"Edit error: {e}")
+            "╭━━━━━━━━━━━━━━━━━╮\n"
             "┣⪼ ⚠️ 𝐈𝐧𝐯𝐚𝐥𝐢𝐝 𝐂𝐡𝐚𝐭 𝐈𝐃\n"
             "╰━━━━━━━━━━━━━━━━━╯"
         )
@@ -1458,18 +1446,12 @@ async def list_chats_cmd(bot: Client, message: Message):
         # First check if user is authorized
         is_auth = await database.is_user_authorized(message.from_user.id)
         if not is_auth:
-            try:
-                await message.reply_text(
-            except Exception as e:
-                print(f"Edit error: {e}")
+            await message.reply_text(
                 "╭━━━━━━━━━━━━━━━━━╮\n"
                 "┣⪼ ⚠️ 𝐔𝐧𝐚𝐮𝐭𝐡𝐨𝐫𝐢𝐳𝐞𝐝 𝐀𝐜𝐜𝐞𝐬𝐬\n"
                 "╰━━━━━━━━━━━━━━━━━╯"
             )
-            try:
-                return
-            except Exception as e:
-                print(f"Edit error: {e}")
+            return
 
         chats = await database.get_user_chats(message.from_user.id)
         
@@ -1477,18 +1459,12 @@ async def list_chats_cmd(bot: Client, message: Message):
             await message.reply_text(
                 "╭━━━━━━━━━━━━━━━━━╮\n"
                 "┣⪼ ℹ️ 𝐍𝐨 𝐂𝐡𝐚𝐭𝐬 𝐀𝐝𝐝𝐞𝐝\n"
-                try:
-                    "╰━━━━━━━━━━━━━━━━━╯"
-                except Exception as e:
-                    print(f"Edit error: {e}")
+                "╰━━━━━━━━━━━━━━━━━╯"
             )
             return
 
         response = "╭━━━━━━━━━━━━━━━━━╮\n"
-        try:
-            response += "┣⪼ 📋 𝐘𝐨𝐮𝐫 𝐀𝐮𝐭𝐡𝐨𝐫𝐢𝐳𝐞𝐝 𝐂𝐡𝐚𝐭𝐬\n"
-        except Exception as e:
-            print(f"Edit error: {e}")
+        response += "┣⪼ 📋 𝐘𝐨𝐮𝐫 𝐀𝐮𝐭𝐡𝐨𝐫𝐢𝐳𝐞𝐝 𝐂𝐡𝐚𝐭𝐬\n"
         response += "╰━━━━━━━━━━━━━━━━━╯\n\n"
 
         for chat_id in chats:
@@ -1496,10 +1472,7 @@ async def list_chats_cmd(bot: Client, message: Message):
                 chat = await bot.get_chat(chat_id)
                 response += "╭─────────────────\n"
                 response += f"┣⪼ 💭 𝐂𝐡𝐚𝐭 𝐈𝐃: {chat_id}\n"
-                try:
-                    response += f"┣⪼ 📝 𝐓𝐲𝐩𝐞: {chat.type}\n"
-                except Exception as e:
-                    print(f"Edit error: {e}")
+                response += f"┣⪼ 📝 𝐓𝐲𝐩𝐞: {chat.type}\n"
                 response += f"┣⪼ 📌 𝐓𝐢𝐭𝐥𝐞: {chat.title}\n"
                 response += "╰─────────────────\n"
             except:
@@ -1510,10 +1483,7 @@ async def list_chats_cmd(bot: Client, message: Message):
 
         await message.reply_text(response)
 
-    try:
-        except Exception as e:
     except Exception as e:
-        print(f"Edit error: {e}")
         await message.reply_text(
             "╭━━━━━━━━━━━━━━━━━╮\n"
             f"┣⪼ ⚠️ 𝐄𝐫𝐫𝐨𝐫: {str(e)}\n"
@@ -1521,17 +1491,11 @@ async def list_chats_cmd(bot: Client, message: Message):
         )
 
 @bot.on_message(filters.command(["diagnose"]) & filters.private)
-try:
-    async def diagnose_cmd(bot: Client, message: Message):
-except Exception as e:
-    print(f"Edit error: {e}")
+async def diagnose_cmd(bot: Client, message: Message):
     """Diagnose authorization issues for a user"""
     try:
         # If no user_id provided, use the sender's ID
-        try:
-            user_id = message.from_user.id
-        except Exception as e:
-            print(f"Edit error: {e}")
+        user_id = message.from_user.id
         if len(message.command) > 1:
             try:
                 user_id = int(message.command[1])
